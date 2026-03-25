@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VoltIQ — Smart Grid Intelligence Platform</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600&display=swap');
+
+  :root {
+    --bg: #050a0e;
+    --surface: #0a1520;
+    --surface2: #0f1f30;
+    --border: #1a3a55;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --accent3: #39ff14;
+    --danger: #ff3366;
+    --warn: #ffaa00;
+    --text: #c8e6f0;
+    --muted: #4a7a99;
+    --glow: 0 0 20px rgba(0, 212, 255, 0.3);
+    --glow2: 0 0 20px rgba(255, 107, 53, 0.3);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── LOGIN SCREEN ── */
+  #loginScreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+  }
+
+  .login-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    padding: 48px 40px;
+    width: 100%;
+    max-width: 420px;
+    position: relative;
+    box-shadow: 0 0 60px rgba(0,212,255,0.1);
+  }
+
+  .login-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(0,212,255,0.04) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .login-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 32px;
+  }
+
+  .login-logo svg { width: 52px; height: 52px; }
+
+  .login-logo-text h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-shadow: var(--glow);
+  }
+
+  .login-logo-text p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .login-tagline {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-bottom: 28px;
+    line-height: 1.6;
+    border-left: 2px solid var(--accent);
+    padding-left: 12px;
+  }
+
+  .login-field {
+    margin-bottom: 16px;
+  }
+
+  .login-field label {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  .login-field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.8rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .login-field input:focus { border-color: var(--accent); }
+  .login-field input::placeholder { color: var(--muted); }
+
+  .login-btn {
+    width: 100%;
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    padding: 13px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+
+  .login-btn:hover { background: #33ddff; box-shadow: var(--glow); }
+  .login-btn:active { transform: scale(0.98); }
+
+  .login-demo-btn {
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 11px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+
+  .login-demo-btn:hover { border-color: var(--accent2); color: var(--accent2); }
+
+  .login-error {
+    background: rgba(255,51,102,0.1);
+    border: 1px solid rgba(255,51,102,0.3);
+    color: var(--danger);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    padding: 8px 12px;
+    margin-top: 10px;
+    display: none;
+  }
+
+  .login-footer {
+    margin-top: 24px;
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.55rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .demo-badge {
+    display: none;
+    background: rgba(255,107,53,0.15);
+    border: 1px solid var(--accent2);
+    color: var(--accent2);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    text-transform: uppercase;
+  }
+
+  /* ── MAIN APP ── */
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    min-height: 100vh;
+    gap: 16px;
+    display: none;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--accent);
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(0,212,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 44px; height: 44px; }
+  .logo-icon svg { width: 100%; height: 100%; }
+
+  .logo-text h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: var(--accent);
+    letter-spacing: 4px;
+    text-shadow: var(--glow);
+  }
+
+  .logo-text p {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .status-bar { display: flex; align-items: center; gap: 20px; }
+
+  .status-pill {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent3);
+    box-shadow: 0 0 8px var(--accent3);
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.idle { background: var(--muted); box-shadow: none; animation: none; }
+  .status-dot.thinking { background: var(--warn); box-shadow: 0 0 8px var(--warn); }
+  .status-dot.error { background: var(--danger); box-shadow: 0 0 8px var(--danger); animation: none; }
+
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .logout-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    padding: 5px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.6rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+
+  .logout-btn:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* Quick tasks */
+  .quick-tasks {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  .task-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    cursor: pointer;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.8rem;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .task-btn::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+  }
+
+  .task-btn:hover { background: var(--surface2); border-color: var(--accent); }
+  .task-btn:hover::before { transform: scaleY(1); }
+  .task-btn:active { transform: scale(0.98); }
+  .task-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .task-btn .task-icon { font-size: 1.2rem; flex-shrink: 0; }
+  .task-btn .task-label { font-weight: 600; color: var(--accent); font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase; }
+  .task-btn .task-desc { color: var(--muted); font-size: 0.72rem; margin-top: 2px; }
+
+  /* Main panel */
+  .main-panel {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 16px;
+    min-height: 0;
+  }
+
+  .chat-panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    max-height: 600px;
+  }
+
+  .panel-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(0,212,255,0.04);
+  }
+
+  .panel-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg { display: flex; gap: 10px; animation: msgIn 0.3s ease-out; }
+
+  @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  .msg-avatar {
+    width: 28px; height: 28px;
+    border-radius: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    font-family: 'Share Tech Mono', monospace;
+    margin-top: 2px;
+  }
+
+  .msg.user .msg-avatar { background: rgba(255,107,53,0.2); border: 1px solid var(--accent2); color: var(--accent2); }
+  .msg.agent .msg-avatar { background: rgba(0,212,255,0.15); border: 1px solid var(--accent); color: var(--accent); }
+  .msg.tool .msg-avatar { background: rgba(57,255,20,0.1); border: 1px solid var(--accent3); color: var(--accent3); }
+  .msg.system .msg-avatar { background: rgba(255,170,0,0.1); border: 1px solid var(--warn); color: var(--warn); }
+
+  .msg-body { flex: 1; min-width: 0; }
+
+  .msg-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+
+  .msg-role {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .msg.user .msg-role { color: var(--accent2); }
+  .msg.agent .msg-role { color: var(--accent); }
+  .msg.tool .msg-role { color: var(--accent3); }
+  .msg.system .msg-role { color: var(--warn); }
+
+  .msg-time { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); }
+
+  .msg-content { font-size: 0.85rem; line-height: 1.6; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+
+  .tool-call {
+    background: rgba(57,255,20,0.05);
+    border: 1px solid rgba(57,255,20,0.15);
+    border-left: 3px solid var(--accent3);
+    padding: 8px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent3);
+  }
+
+  .tool-call .tool-name { font-weight: bold; margin-bottom: 4px; }
+  .tool-call .tool-args { color: #7aaa70; font-size: 0.65rem; }
+
+  .thinking {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--warn);
+  }
+
+  .thinking-dots span {
+    display: inline-block;
+    width: 5px; height: 5px;
+    background: var(--warn);
+    border-radius: 50%;
+    animation: dot 1.2s infinite;
+  }
+  .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dot { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; } 40% { transform: scale(1); opacity: 1; } }
+
+  /* Sidebar */
+  .sidebar { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow-y: auto; }
+  .sidebar::-webkit-scrollbar { width: 3px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .side-card { background: var(--surface); border: 1px solid var(--border); overflow: hidden; }
+  .side-card .panel-header { padding: 8px 12px; }
+  .side-card .panel-title { font-size: 0.58rem; }
+
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+
+  .metric { background: var(--surface); padding: 10px 12px; }
+  .metric-label { font-family: 'Share Tech Mono', monospace; font-size: 0.58rem; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+  .metric-value { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+  .metric-value.warn { color: var(--warn); }
+  .metric-value.danger { color: var(--danger); }
+  .metric-value.ok { color: var(--accent3); }
+  .metric-unit { font-size: 0.6rem; color: var(--muted); margin-left: 2px; }
+
+  .tool-log { padding: 10px 12px; max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; }
+  .tool-log::-webkit-scrollbar { width: 3px; }
+  .tool-log::-webkit-scrollbar-thumb { background: var(--border); }
+
+  .log-entry {
+    display: flex; align-items: flex-start; gap: 8px;
+    font-family: 'Share Tech Mono', monospace; font-size: 0.65rem;
+    padding: 4px 0; border-bottom: 1px solid rgba(26,58,85,0.5);
+    animation: msgIn 0.3s ease-out;
+  }
+  .log-entry:last-child { border-bottom: none; }
+  .log-icon { flex-shrink: 0; }
+  .log-text { color: var(--muted); line-height: 1.4; }
+  .log-text strong { color: var(--accent3); }
+  .log-empty { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--muted); text-align: center; padding: 12px 0; }
+
+  /* Feeder list */
+  .feeder-list { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; }
+  .feeder-row { display: flex; align-items: center; gap: 8px; font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; }
+  .feeder-id { color: var(--accent); width: 70px; flex-shrink: 0; }
+  .feeder-bar-wrap { flex: 1; height: 6px; background: rgba(255,255,255,0.05); }
+  .feeder-bar { height: 100%; background: var(--accent3); }
+  .feeder-bar.warn { background: var(--warn); }
+  .feeder-bar.danger { background: var(--danger); }
+  .feeder-val { color: var(--muted); width: 36px; text-align: right; flex-shrink: 0; }
+
+  /* Input area */
+  .input-area {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-top: 2px solid var(--accent);
+    padding: 12px 16px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+
+  .input-wrap { flex: 1; position: relative; }
+  .input-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+
+  textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    resize: none;
+    min-height: 52px;
+    max-height: 120px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.5;
+  }
+
+  textarea:focus { border-color: var(--accent); }
+  textarea::placeholder { color: var(--muted); }
+
+  .send-btn {
+    background: var(--accent);
+    border: none;
+    color: var(--bg);
+    width: 52px; height: 52px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    font-size: 1.2rem;
+  }
+
+  .send-btn:hover { background: #33ddff; box-shadow: var(--glow); }
+  .send-btn:active { transform: scale(0.95); }
+  .send-btn:disabled { background: var(--muted); cursor: not-allowed; box-shadow: none; }
+
+  /* API key section */
+  .api-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--warn);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .api-section label { font-family: 'Share Tech Mono', monospace; font-size: 0.65rem; color: var(--warn); letter-spacing: 2px; white-space: nowrap; }
+
+  .api-input {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 7px 12px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .api-input:focus { border-color: var(--warn); }
+  .api-input::placeholder { color: var(--muted); }
+
+  /* Export button */
+  .export-btn {
+    background: transparent;
+    border: 1px solid var(--accent3);
+    color: var(--accent3);
+    padding: 7px 14px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  .export-btn:hover { background: rgba(57,255,20,0.1); box-shadow: 0 0 10px rgba(57,255,20,0.2); }
+
+  /* Demo banner */
+  .demo-banner {
+    display: none;
+    background: rgba(255,107,53,0.08);
+    border: 1px solid rgba(255,107,53,0.3);
+    border-left: 3px solid var(--accent2);
+    padding: 10px 16px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent2);
+    letter-spacing: 1px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  /* Watermark */
+  .watermark {
+    position: fixed;
+    bottom: 12px;
+    right: 16px;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.55rem;
+    color: rgba(0,212,255,0.15);
+    letter-spacing: 3px;
+    pointer-events: none;
+    z-index: 0;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <svg viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="26,2 50,15 50,37 26,50 2,37 2,15" stroke="#00d4ff" stroke-width="1.5" fill="rgba(0,212,255,0.06)"/>
+        <path d="M28 9L16 26H25L23 43L36 26H27L28 9Z" fill="#00d4ff" opacity="0.9"/>
+        <circle cx="26" cy="26" r="3.5" fill="#00d4ff"/>
+        <circle cx="26" cy="26" r="6" stroke="#00d4ff" stroke-width="0.5" opacity="0.4"/>
+      </svg>
+      <div class="login-logo-text">
+        <h1>VoltIQ</h1>
+        <p>Smart Grid Intelligence Platform</p>
+      </div>
+    </div>
+
+    <p class="login-tagline">AI-powered energy theft detection, voltage optimization, and distribution analytics for Nigerian DisCos.</p>
+
+    <div class="login-field">
+      <label>Username</label>
+      <input type="text" id="loginUser" placeholder="Enter username" autocomplete="off" />
+    </div>
+
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password" />
+    </div>
+
+    <button class="login-btn" onclick="doLogin()">ACCESS PLATFORM →</button>
+    <button class="login-demo-btn" onclick="doDemo()">▶ LAUNCH DEMO MODE (No Login Required)</button>
+
+    <div class="login-error" id="loginError">⚠ Invalid credentials. Try demo mode below.</div>
+
+    <div class="login-footer">
+      VOLTIQ v2.0 · SECURED ACCESS · © 2026<br>
+      <span style="margin-top:4px;display:block;">For licensing enquiries: voltiq.ng</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<div class="app" id="mainApp">
+
+  <!-- Header -->
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="22,2 42,13 42,31 22,42 2,31 2,13" stroke="#00d4ff" stroke-width="1.5" fill="rgba(0,212,255,0.05)"/>
+          <path d="M24 8L14 22H22L20 36L30 22H22L24 8Z" fill="#00d4ff" opacity="0.9"/>
+          <circle cx="22" cy="22" r="3" fill="#00d4ff"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>VoltIQ</h1>
+        <p>Smart Grid Intelligence Platform</p>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="demo-badge" id="demoBadge">◈ DEMO MODE</span>
+      <div class="status-bar">
+        <div class="status-pill">
+          <div class="status-dot idle" id="statusDot"></div>
+          <span id="statusText">STANDBY</span>
+        </div>
+        <div class="status-pill">🕐 <span id="turnCount">0 TURNS</span></div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">LOGOUT</button>
+    </div>
+  </header>
+
+  <!-- Demo Banner -->
+  <div class="demo-banner" id="demoBanner">
+    ⚡ DEMO MODE ACTIVE — All data is simulated. Enter your Anthropic API key below to enable live AI analysis.
+  </div>
+
+  <!-- API Key -->
+  <div class="api-section">
+    <label>⚡ API KEY</label>
+    <input class="api-input" type="password" id="apiKey" placeholder="sk-ant-api03-... (required for live AI analysis)" />
+    <span style="font-family:'Share Tech Mono',monospace;font-size:0.6rem;color:var(--muted);white-space:nowrap;">Runs client-side · not stored</span>
+    <button class="export-btn" onclick="exportReport()">⬇ Export Report</button>
+  </div>
+
+  <!-- Quick Tasks -->
+  <div class="quick-tasks">
+    <button class="task-btn" onclick="runQuickTask(0)">
+      <span class="task-icon">🔍</span>
+      <div>
+        <div class="task-label">Theft Detection</div>
+        <div class="task-desc">Analyze FDR-102 for anomalies</div>
+      </div>
+    </button>
+    <button class="task-btn" onclick="runQuickTask(1)">
+      <span class="task-icon">⚡</span>
+      <div>
+        <div class="task-label">Voltage Optimize</div>
+        <div class="task-desc">Reduce losses in Zone-A grid</div>
+      </div>
+    </button>
+    <button class="task-btn" onclick="runQuickTask(2)">
+      <span class="task-icon">📊</span>
+      <div>
+        <div class="task-label">Full Audit</div>
+        <div class="task-desc">FDR-102: theft + voltage report</div>
+      </div>
+    </button>
+    <button class="task-btn" onclick="runQuickTask(3)">
+      <span class="task-icon">🔧</span>
+      <div>
+        <div class="task-label">Transformer Check</div>
+        <div class="task-desc">Status of TX-07 Ikeja zone</div>
+      </div>
+    </button>
+  </div>
+
+  <!-- Main Panel -->
+  <div class="main-panel">
+
+    <!-- Chat -->
+    <div class="chat-panel">
+      <div class="panel-header">
+        <span class="panel-title">◈ Agent Console</span>
+        <button onclick="clearChat()" style="background:none;border:none;color:var(--muted);font-size:0.65rem;cursor:pointer;font-family:'Share Tech Mono',monospace;letter-spacing:1px;">[ CLEAR ]</button>
+      </div>
+      <div class="messages" id="messages">
+        <div class="msg system">
+          <div class="msg-avatar">SYS</div>
+          <div class="msg-body">
+            <div class="msg-meta">
+              <span class="msg-role">System</span>
+              <span class="msg-time" id="initTime"></span>
+            </div>
+            <div class="msg-content">VoltIQ Agent online. Enter your API key and assign a task. The agent will autonomously call tools to analyze feeders, detect energy theft, and optimize voltage settings across the distribution network.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+
+      <div class="side-card">
+        <div class="panel-header">
+          <span class="panel-title">◈ Grid Metrics</span>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric">
+            <div class="metric-label">Grid Loss</div>
+            <div class="metric-value danger" id="m-loss">38.2<span class="metric-unit">%</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Active Feeds</div>
+            <div class="metric-value ok" id="m-feeds">6<span class="metric-unit">/8</span></div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Theft Alerts</div>
+            <div class="metric-value warn" id="m-alerts">2</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">Voltage</div>
+            <div class="metric-value" id="m-voltage">11.4<span class="metric-unit">kV</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="panel-header">
+          <span class="panel-title">◈ Feeder Load</span>
+        </div>
+        <div class="feeder-list">
+          <div class="feeder-row">
+            <span class="feeder-id">FDR-101</span>
+            <div class="feeder-bar-wrap"><div class="feeder-bar" style="width:45%"></div></div>
+            <span class="feeder-val">45%</span>
+          </div>
+          <div class="feeder-row">
+            <span class="feeder-id">FDR-102</span>
+            <div class="feeder-bar-wrap"><div class="feeder-bar danger" style="width:82%"></div></div>
+            <span class="feeder-val">82%</span>
+          </div>
+          <div class="feeder-row">
+            <span class="feeder-id">FDR-103</span>
+            <div class="feeder-bar-wrap"><div class="feeder-bar warn" style="width:67%"></div></div>
+            <span class="feeder-val">67%</span>
+          </div>
+          <div class="feeder-row">
+            <span class="feeder-id">FDR-104</span>
+            <div class="feeder-bar-wrap"><div class="feeder-bar" style="width:38%"></div></div>
+            <span class="feeder-val">38%</span>
+          </div>
+          <div class="feeder-row">
+            <span class="feeder-id">FDR-105</span>
+            <div class="feeder-bar-wrap"><div class="feeder-bar" style="width:54%"></div></div>
+            <span class="feeder-val">54%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="side-card">
+        <div class="panel-header">
+          <span class="panel-title">◈ Tool Activity</span>
+        </div>
+        <div class="tool-log" id="toolLog">
+          <div class="log-empty">No tool calls yet</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="input-area">
+    <div class="input-wrap">
+      <div class="input-label">◈ Mission Brief</div>
+      <textarea id="userInput" placeholder="e.g. Analyze feeder FDR-102, check for theft, then optimize voltage settings and provide a full report..." rows="2"></textarea>
+    </div>
+    <button class="send-btn" id="sendBtn" onclick="sendMessage()" title="Deploy Agent">▶</button>
+  </div>
+
+</div>
+
+<div class="watermark">VOLTIQ · SMART GRID INTELLIGENCE</div>
+
+<script>
+// ── Auth ──────────────────────────────────────────────────────────────────────
+const VALID_USERS = { "admin": "voltiq2026", "demo": "demo123", "operator": "grid2026" };
+let isDemoMode = false;
+let reportLines = [];
+
+function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value.trim();
+  if (VALID_USERS[user] && VALID_USERS[user] === pass) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'grid';
+    document.getElementById('initTime').textContent = timestamp();
+  } else {
+    const err = document.getElementById('loginError');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 3000);
+  }
+}
+
+function doDemo() {
+  isDemoMode = true;
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'grid';
+  document.getElementById('demoBanner').style.display = 'flex';
+  document.getElementById('demoBadge').style.display = 'inline-block';
+  document.getElementById('initTime').textContent = timestamp();
+  addMessage('system', 'DEMO MODE ACTIVE — You are viewing VoltIQ with simulated data. All tool calls return realistic mock data. Add your Anthropic API key above to enable full AI-powered analysis.');
+}
+
+function doLogout() {
+  isDemoMode = false;
+  document.getElementById('mainApp').style.display = 'none';
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  document.getElementById('demoBanner').style.display = 'none';
+  document.getElementById('demoBadge').style.display = 'none';
+  clearChat();
+}
+
+document.getElementById('loginPass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') doLogin();
+});
+
+// ── Export ────────────────────────────────────────────────────────────────────
+function exportReport() {
+  const msgs = document.querySelectorAll('#messages .msg');
+  let text = `VOLTIQ — SMART GRID INTELLIGENCE PLATFORM\n`;
+  text += `Report Generated: ${new Date().toLocaleString()}\n`;
+  text += `${'='.repeat(60)}\n\n`;
+  msgs.forEach(msg => {
+    const role = msg.querySelector('.msg-role')?.textContent || '';
+    const time = msg.querySelector('.msg-time')?.textContent || '';
+    const content = msg.querySelector('.msg-content')?.textContent || msg.querySelector('.tool-call')?.textContent || '';
+    if (content.trim()) {
+      text += `[${time}] ${role.toUpperCase()}\n${content.trim()}\n\n`;
+    }
+  });
+  text += `${'='.repeat(60)}\n© 2026 VoltIQ. All rights reserved.\n`;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `VoltIQ_Report_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Tool definitions ──────────────────────────────────────────────────────────
+const TOOLS = [
+  {
+    name: "get_transformer_status",
+    description: "Get current status of a distribution transformer",
+    input_schema: {
+      type: "object",
+      properties: {
+        transformer_id: { type: "string", description: "Transformer ID e.g. TX-07" },
+        disco_name: { type: "string", description: "Distribution company e.g. Ikeja Electric" }
+      },
+      required: ["transformer_id"]
+    }
+  },
+  {
+    name: "detect_theft_anomalies",
+    description: "Analyze consumption patterns to detect possible energy theft on a feeder",
+    input_schema: {
+      type: "object",
+      properties: {
+        feeder_id: { type: "string", description: "Feeder ID e.g. FDR-102" },
+        time_range_days: { type: "integer", description: "Analysis window in days", default: 30 }
+      },
+      required: ["feeder_id"]
+    }
+  },
+  {
+    name: "optimize_voltage",
+    description: "Calculate optimal voltage setpoints and tap positions to minimize distribution losses",
+    input_schema: {
+      type: "object",
+      properties: {
+        zone_id: { type: "string", description: "Zone identifier e.g. ZONE-A" },
+        target_loss_reduction: { type: "number", description: "Target loss reduction in %", minimum: 0, maximum: 20 }
+      },
+      required: ["zone_id"]
+    }
+  },
+  {
+    name: "fetch_meter_data",
+    description: "Retrieve consumption data from smart meters for analysis",
+    input_schema: {
+      type: "object",
+      properties: {
+        meter_ids: { type: "array", items: { type: "string" }, description: "List of meter IDs" },
+        start_date: { type: "string", description: "Start date YYYY-MM-DD" }
+      },
+      required: ["meter_ids"]
+    }
+  }
+];
+
+// ── Tool implementations ──────────────────────────────────────────────────────
+function executeTool(name, args) {
+  const now = new Date().toISOString();
+
+  if (name === "get_transformer_status") {
+    return {
+      transformer_id: args.transformer_id,
+      disco_name: args.disco_name || "Ikeja Electric",
+      voltage_kv: 11.4, load_percent: 68, temperature_c: 72,
+      status: "operational", power_factor: 0.87,
+      last_fault: "2026-02-14T03:22:00Z", last_updated: now
+    };
+  }
+
+  if (name === "detect_theft_anomalies") {
+    return {
+      feeder_id: args.feeder_id,
+      analysis_period_days: args.time_range_days || 30,
+      total_input_kwh: 142800, total_billed_kwh: 88213,
+      total_loss_percent: 38.2, benchmark_loss_percent: 8.5,
+      excess_loss_percent: 29.7,
+      suspected_anomalies: [
+        { meter_id: "MTR-4892", address: "12 Adeniyi Jones", loss_contribution_kwh: 17556, confidence: 0.92, pattern: "bypass_suspected" },
+        { meter_id: "MTR-2104", address: "7 Oregun Road", loss_contribution_kwh: 12422, confidence: 0.87, pattern: "meter_tampering" },
+        { meter_id: "MTR-3371", address: "Agege Motor Road", loss_contribution_kwh: 5840, confidence: 0.71, pattern: "illegal_connection" }
+      ],
+      estimated_monthly_revenue_loss_ngn: 4820000,
+      recommended_action: "Deploy field inspection team to MTR-4892 immediately."
+    };
+  }
+
+  if (name === "optimize_voltage") {
+    return {
+      zone_id: args.zone_id,
+      current_avg_voltage_kv: 11.4, current_loss_percent: 6.8,
+      recommendations: [
+        { device: "OLTC TX-07", action: "Tap position -2", expected_improvement_percent: 3.2 },
+        { device: "Capacitor Bank CB-03", action: "Switch ON 450 kVAr", expected_improvement_percent: 2.8 },
+        { device: "Voltage Regulator VR-12", action: "Set to 11.6 kV", expected_improvement_percent: 1.9 }
+      ],
+      total_expected_loss_reduction_percent: 7.9,
+      estimated_savings_kwh_per_day: 1240,
+      estimated_savings_ngn_per_month: 3100000,
+      cautions: ["Monitor end-of-line voltage at Agege substation", "Coordinate cap bank switching with load forecast"]
+    };
+  }
+
+  if (name === "fetch_meter_data") {
+    return {
+      meters: (args.meter_ids || []).map(id => ({
+        id,
+        consumption_kwh_30d: Math.floor(200 + Math.random() * 600),
+        avg_daily_kwh: Math.floor(10 + Math.random() * 30),
+        last_reading: "2026-03-25",
+        tamper_flag: id === "MTR-4892",
+        credit_balance_ngn: Math.floor(Math.random() * 5000)
+      }))
+    };
+  }
+
+  return { error: `Unknown tool: ${name}` };
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let isRunning = false;
+let turnCount = 0;
+const MAX_TURNS = 15;
+
+function timestamp() {
+  return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+function setStatus(state) {
+  const dot = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className = 'status-dot ' + state;
+  const labels = { idle: 'STANDBY', thinking: 'PROCESSING', ok: 'COMPLETE', error: 'ERROR' };
+  text.textContent = labels[state] || state.toUpperCase();
+}
+
+function addMessage(role, content, extra = '') {
+  const msgs = document.getElementById('messages');
+  const avatars = { user: 'OPS', agent: 'AI', tool: 'TOOL', system: 'SYS' };
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  let contentHtml = '';
+  if (role === 'tool') {
+    contentHtml = `<div class="tool-call"><div class="tool-name">▸ ${extra}</div><div class="tool-args">${escHtml(content)}</div></div>`;
+  } else {
+    contentHtml = `<div class="msg-content">${escHtml(content)}</div>`;
+  }
+  div.innerHTML = `
+    <div class="msg-avatar">${avatars[role] || role}</div>
+    <div class="msg-body">
+      <div class="msg-meta">
+        <span class="msg-role">${role.charAt(0).toUpperCase() + role.slice(1)}</span>
+        <span class="msg-time">${timestamp()}</span>
+      </div>
+      ${contentHtml}
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+function addThinking() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg agent';
+  div.id = 'thinkingMsg';
+  div.innerHTML = `
+    <div class="msg-avatar">AI</div>
+    <div class="msg-body">
+      <div class="msg-meta"><span class="msg-role">Agent</span><span class="msg-time">${timestamp()}</span></div>
+      <div class="thinking">Processing <div class="thinking-dots"><span></span><span></span><span></span></div></div>
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeThinking() {
+  const el = document.getElementById('thinkingMsg');
+  if (el) el.remove();
+}
+
+function logTool(name, args) {
+  const log = document.getElementById('toolLog');
+  const empty = log.querySelector('.log-empty');
+  if (empty) empty.remove();
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.innerHTML = `<span class="log-icon">⚙</span><span class="log-text"><strong>${name}</strong> → ${JSON.stringify(args).slice(0, 60)}${JSON.stringify(args).length > 60 ? '…' : ''}</span>`;
+  log.appendChild(entry);
+  log.scrollTop = log.scrollHeight;
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function setRunning(running) {
+  isRunning = running;
+  document.getElementById('sendBtn').disabled = running;
+  document.getElementById('userInput').disabled = running;
+  document.querySelectorAll('.task-btn').forEach(b => b.disabled = running);
+  setStatus(running ? 'thinking' : 'ok');
+}
+
+function updateTurnDisplay() {
+  document.getElementById('turnCount').textContent = `${turnCount} TURNS`;
+}
+
+function clearChat() {
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  document.getElementById('toolLog').innerHTML = '<div class="log-empty">No tool calls yet</div>';
+  turnCount = 0;
+  updateTurnDisplay();
+  setStatus('idle');
+  addMessage('system', 'Console cleared. Ready for new mission.');
+}
+
+// ── Agent loop ────────────────────────────────────────────────────────────────
+async function runAgent(task) {
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  if (!apiKey) {
+    addMessage('system', '⚠ No API key detected. Running in DEMO mode — responses are simulated.\n\nTo enable live AI analysis, enter your Anthropic API key above.');
+    await runDemoMode(task);
+    setRunning(false);
+    return;
+  }
+
+  const messages = [{ role: 'user', content: task }];
+  turnCount = 0;
+
+  const SYSTEM = `You are VoltIQ AI, an expert agent for Nigerian electricity distribution companies (DisCos).
+You have deep expertise in power systems engineering, energy theft detection, and smart metering.
+Use your tools to analyze the distribution network and provide specific, actionable recommendations.
+When you detect energy theft, quantify the revenue impact in Naira. Be precise with technical details.
+Always end with a structured summary report. Brand yourself as VoltIQ AI throughout.`;
+
+  for (let turn = 0; turn < MAX_TURNS; turn++) {
+    turnCount = turn + 1;
+    updateTurnDisplay();
+    addThinking();
+
+    let response;
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5',
+          max_tokens: 2048,
+          system: SYSTEM,
+          messages,
+          tools: TOOLS,
+          tool_choice: { type: 'auto' }
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        removeThinking();
+        addMessage('system', `⚠ API Error ${res.status}: ${err?.error?.message || res.statusText}`);
+        setStatus('error');
+        break;
+      }
+
+      response = await res.json();
+    } catch (e) {
+      removeThinking();
+      addMessage('system', `⚠ Network error: ${e.message}`);
+      setStatus('error');
+      break;
+    }
+
+    removeThinking();
+    messages.push({ role: 'assistant', content: response.content });
+
+    if (response.stop_reason === 'end_turn') {
+      const textBlock = response.content.find(b => b.type === 'text');
+      if (textBlock) addMessage('agent', textBlock.text);
+      setStatus('ok');
+      break;
+    }
+
+    if (response.stop_reason === 'tool_use') {
+      const textBlock = response.content.find(b => b.type === 'text');
+      if (textBlock && textBlock.text.trim()) addMessage('agent', textBlock.text);
+
+      const toolResults = [];
+      for (const block of response.content) {
+        if (block.type !== 'tool_use') continue;
+        logTool(block.name, block.input);
+        let result;
+        try { result = executeTool(block.name, block.input); }
+        catch (e) { result = { error: `Tool error: ${e.message}` }; }
+        const preview = JSON.stringify(result, null, 2).slice(0, 300) + (JSON.stringify(result).length > 300 ? '\n…' : '');
+        addMessage('tool', preview, block.name + `(${JSON.stringify(block.input).slice(0,50)}…)`);
+        toolResults.push({ type: 'tool_result', tool_use_id: block.id, content: JSON.stringify(result) });
+      }
+      messages.push({ role: 'user', content: toolResults });
+    } else {
+      addMessage('system', `Unexpected stop reason: ${response.stop_reason}`);
+      break;
+    }
+  }
+
+  setRunning(false);
+}
+
+// ── Demo mode (no API key) ────────────────────────────────────────────────────
+async function runDemoMode(task) {
+  await sleep(800);
+  addThinking();
+  await sleep(1200);
+  removeThinking();
+
+  logTool('detect_theft_anomalies', { feeder_id: 'FDR-102' });
+  const r1 = executeTool('detect_theft_anomalies', { feeder_id: 'FDR-102' });
+  addMessage('tool', JSON.stringify(r1, null, 2).slice(0, 300) + '…', 'detect_theft_anomalies({"feeder_id":"FDR-102"}…)');
+
+  await sleep(600);
+  addThinking();
+  await sleep(1000);
+  removeThinking();
+
+  logTool('optimize_voltage', { zone_id: 'ZONE-A' });
+  const r2 = executeTool('optimize_voltage', { zone_id: 'ZONE-A' });
+  addMessage('tool', JSON.stringify(r2, null, 2).slice(0, 300) + '…', 'optimize_voltage({"zone_id":"ZONE-A"}…)');
+
+  await sleep(800);
+  addThinking();
+  await sleep(1400);
+  removeThinking();
+
+  addMessage('agent', `━━━ VOLTIQ AI ANALYSIS REPORT ━━━\nFeeder: FDR-102 | Zone: Ikeja Electric\n\n🔴 ENERGY THEFT DETECTED\n• Total system loss: 38.2% (benchmark: 8.5%)\n• Excess loss: 29.7% — indicating significant non-technical losses\n• Estimated monthly revenue loss: ₦4,820,000\n\nTop 3 Suspects:\n1. MTR-4892 — 12 Adeniyi Jones (Confidence: 92%) — Bypass suspected\n2. MTR-2104 — 7 Oregun Road (Confidence: 87%) — Meter tampering\n3. MTR-3371 — Agege Motor Road (Confidence: 71%) — Illegal connection\n\n⚡ VOLTAGE OPTIMIZATION\n• Recommended actions:\n  – OLTC TX-07: Tap position -2 (+3.2% improvement)\n  – Capacitor Bank CB-03: Switch ON 450 kVAr (+2.8%)\n  – Voltage Regulator VR-12: Set to 11.6 kV (+1.9%)\n• Total expected loss reduction: 7.9%\n• Estimated monthly savings: ₦3,100,000\n\n✅ IMMEDIATE ACTIONS:\n1. Deploy field inspection to MTR-4892 within 24 hours\n2. Apply OLTC tap change before peak load tonight\n3. Schedule CB-03 switching with operations team\n\n— VoltIQ AI | Smart Grid Intelligence Platform`);
+
+  setStatus('ok');
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+// ── Quick tasks ───────────────────────────────────────────────────────────────
+const QUICK_TASKS = [
+  "Analyze feeder FDR-102 for energy theft anomalies. Identify the top suspects, quantify the revenue loss, and provide immediate action steps.",
+  "Run voltage optimization for Zone-A. Calculate optimal tap settings and capacitor bank switching to achieve maximum loss reduction. Provide specific device setpoints.",
+  "Perform a complete audit of feeder FDR-102: check for theft anomalies, then optimize voltage settings for that zone. Produce a comprehensive report with prioritized recommendations and estimated savings in Naira.",
+  "Check transformer TX-07 status in Ikeja Electric zone. Then fetch meter data for meters MTR-4892, MTR-2104, and MTR-3371. Summarize findings."
+];
+
+function runQuickTask(idx) {
+  const input = document.getElementById('userInput');
+  input.value = QUICK_TASKS[idx];
+  sendMessage();
+}
+
+// ── Send ──────────────────────────────────────────────────────────────────────
+async function sendMessage() {
+  if (isRunning) return;
+  const input = document.getElementById('userInput');
+  const task = input.value.trim();
+  if (!task) return;
+  setRunning(true);
+  addMessage('user', task);
+  input.value = '';
+  await runAgent(task);
+}
+
+document.getElementById('userInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+document.getElementById('userInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+</script>
+</body>
+</html>
